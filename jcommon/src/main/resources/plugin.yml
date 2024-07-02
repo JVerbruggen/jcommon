@@ -1,7 +1,0 @@
-main: com.jverbruggen.jrides.plugin.Main
-name: jcommon
-version: ${minecraft.version.short}
-authors: [MeneerPinguin]
-api-version: ${minecraft.version.apiversion}
-load: POSTWORLD
-depend: [ProtocolLib]
