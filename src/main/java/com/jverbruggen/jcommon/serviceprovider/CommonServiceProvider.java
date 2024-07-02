@@ -23,6 +23,6 @@ import java.util.function.Function;
 public interface CommonServiceProvider {
     <T> T _getSingleton(Class<T> type);
 
-    void _register(Class type, Object instance);
+    <T> T _register(Class<T> type, T instance);
     <T extends CommonServiceProvider, R> void _register(Class<R> type, Function<T, R> function);
 }

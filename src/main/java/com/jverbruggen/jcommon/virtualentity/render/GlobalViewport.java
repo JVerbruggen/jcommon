@@ -2,7 +2,7 @@
  * GPLv3 License                                                                                            *
  *                                                                                                          *
  * Copyright (c) 2024-2024 JVerbruggen                                                                      *
- * https://github.com/JVerbruggen/jcommon                                                                   *
+ * https://github.com/JVerbruggen/jrides                                                                    *
  *                                                                                                          *
  * This software is protected under the GPLv3 license,                                                      *
  * that can be found in the project's LICENSE file.                                                         *
@@ -15,13 +15,17 @@
  * inflicted by the software.                                                                               *
  ************************************************************************************************************/
 
-package com.jverbruggen.jcommon.packet.objects;
+package com.jverbruggen.jcommon.virtualentity.render;
 
-import com.jverbruggen.jcommon.virtualentity.render.Viewer;
+import com.jverbruggen.jcommon.math.Vector3;
 
-import java.util.List;
+public class GlobalViewport extends VirtualEntityViewport implements Viewport {
+    public GlobalViewport(int maxRenderDistance) {
+        super(maxRenderDistance);
+    }
 
-public interface Packet {
-    boolean send(Viewer viewer);
-    void sendAll(List<Viewer> viewers);
+    @Override
+    public boolean isInViewport(Vector3 location) {
+        return true;
+    }
 }

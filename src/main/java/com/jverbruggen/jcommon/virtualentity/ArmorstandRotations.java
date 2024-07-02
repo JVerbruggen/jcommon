@@ -2,7 +2,7 @@
  * GPLv3 License                                                                                            *
  *                                                                                                          *
  * Copyright (c) 2024-2024 JVerbruggen                                                                      *
- * https://github.com/JVerbruggen/jcommon                                                                   *
+ * https://github.com/JVerbruggen/jrides                                                                    *
  *                                                                                                          *
  * This software is protected under the GPLv3 license,                                                      *
  * that can be found in the project's LICENSE file.                                                         *
@@ -15,27 +15,67 @@
  * inflicted by the software.                                                                               *
  ************************************************************************************************************/
 
-package com.jverbruggen.jcommon.serviceprovider.internal;
+package com.jverbruggen.jcommon.virtualentity;
 
-import com.jverbruggen.jcommon.serviceprovider.CommonServiceProvider;
-import com.jverbruggen.jcommon.serviceprovider.CommonServiceProviderFactory;
+import com.jverbruggen.jcommon.math.Vector3;
 
-import java.util.function.Function;
-import java.util.logging.Logger;
+public class ArmorstandRotations {
+    private Vector3 head, body, offHand, mainHand, leftLeg, rightLeg;
 
-public interface InternalServiceProvider {
-    CommonServiceProvider instance = CommonServiceProviderFactory.createServiceProvider(Logger.getGlobal());
-
-    static <T> T getSingleton(Class<T> type){
-        return instance._getSingleton(type);
+    public ArmorstandRotations(){
+        head = new Vector3(0,0,0);
+        body = new Vector3(0,0,0);
+        offHand = new Vector3(0,0,0);
+        mainHand = new Vector3(0,0,0);
+        leftLeg = new Vector3(0,0,0);
+        rightLeg = new Vector3(0,0,0);
     }
 
-    static <R> R register(Class<R> type, R o){
-        instance._register(type, o);
-        return o;
+    public Vector3 getHead() {
+        return head;
     }
 
-    static <T extends CommonServiceProvider, R> void registerWith(Class<R> type, Function<T, R> function){
-        instance._register(type, function);
+    public void setHead(Vector3 head) {
+        this.head = head;
+    }
+
+    public Vector3 getBody() {
+        return body;
+    }
+
+    public void setBody(Vector3 body) {
+        this.body = body;
+    }
+
+    public Vector3 getOffHand() {
+        return offHand;
+    }
+
+    public void setOffHand(Vector3 offHand) {
+        this.offHand = offHand;
+    }
+
+    public Vector3 getMainHand() {
+        return mainHand;
+    }
+
+    public void setMainHand(Vector3 mainHand) {
+        this.mainHand = mainHand;
+    }
+
+    public Vector3 getLeftLeg() {
+        return leftLeg;
+    }
+
+    public void setLeftLeg(Vector3 leftLeg) {
+        this.leftLeg = leftLeg;
+    }
+
+    public Vector3 getRightLeg() {
+        return rightLeg;
+    }
+
+    public void setRightLeg(Vector3 rightLeg) {
+        this.rightLeg = rightLeg;
     }
 }

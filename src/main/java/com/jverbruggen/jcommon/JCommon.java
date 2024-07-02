@@ -29,7 +29,7 @@ public class JCommon {
     private static final HashMap<JavaPlugin, JCommonManager> SESSIONS = new LinkedHashMap<>();
 
     private static JCommonManager createNewManager(JavaPlugin javaPlugin){
-        CommonServiceProvider serviceProvider = CommonServiceProviderFactory.createServiceProvider(javaPlugin.getLogger());
+        CommonServiceProvider serviceProvider = CommonServiceProviderFactory.createServiceProvider(javaPlugin);
 
         return new JCommonManager(serviceProvider);
     }

@@ -21,16 +21,23 @@ import com.comphenix.protocol.ProtocolLibrary;
 import com.comphenix.protocol.ProtocolManager;
 import com.jverbruggen.jcommon.logging.Logger;
 import com.jverbruggen.jcommon.logging.SimpleLogger;
+import com.jverbruggen.jcommon.nms.NMSHandler;
+import com.jverbruggen.jcommon.nms.NMSHandlerFactory;
 import com.jverbruggen.jcommon.packet.sender.PacketSender;
 import com.jverbruggen.jcommon.packet.sender.impl.PacketSender_1_20_4;
+import com.jverbruggen.jcommon.player.PlayerManager;
+import com.jverbruggen.jcommon.virtualentity.id.EntityIdFactory;
+import com.jverbruggen.jcommon.virtualentity.render.manager.ViewportManagerFactory;
+import org.bukkit.plugin.java.JavaPlugin;
 
 public class CommonServiceProviderFactory {
-    public static CommonServiceProvider createServiceProvider(java.util.logging.Logger parentLogger){
-        return createServiceProvider(parentLogger, Settings.defaultValues());
+    public static CommonServiceProvider createServiceProvider(JavaPlugin javaPlugin){
+        return createServiceProvider(javaPlugin, Settings.defaultValues());
     }
 
-    public static CommonServiceProvider createServiceProvider(java.util.logging.Logger parentLogger, Settings settings){
+    public static CommonServiceProvider createServiceProvider(JavaPlugin javaPlugin, Settings settings){
         CommonServiceProvider commonServiceProvider = new HashMapCommonServiceProvider();
+        java.util.logging.Logger parentLogger = javaPlugin.getLogger();
 
         configureServiceProvider(commonServiceProvider, parentLogger, settings);
 
@@ -38,11 +45,12 @@ public class CommonServiceProviderFactory {
     }
 
     private static void configureServiceProvider(CommonServiceProvider commonServiceProvider, java.util.logging.Logger parentLogger, Settings settings){
-        ProtocolManager protocolManager = ProtocolLibrary.getProtocolManager();
-        Logger logger = new SimpleLogger(parentLogger, settings.prefix(), settings.broadcastMode(), settings.debugMode());
-
-        commonServiceProvider._register(ProtocolManager.class, protocolManager);
-        commonServiceProvider._register(Logger.class, logger);
-        commonServiceProvider._register(PacketSender.class, new PacketSender_1_20_4(protocolManager, logger));
+        ProtocolManager protocolManager                 = commonServiceProvider._register(ProtocolManager.class,        ProtocolLibrary.getProtocolManager());
+        Logger logger                                   = commonServiceProvider._register(Logger.class,                 new SimpleLogger(parentLogger, settings.prefix(), settings.broadcastMode(), settings.debugMode()));
+        PacketSender packetSender                       = commonServiceProvider._register(PacketSender.class,           new PacketSender_1_20_4(protocolManager, logger));
+        EntityIdFactory entityIdFactory                 = commonServiceProvider._register(EntityIdFactory.class,        new EntityIdFactory(1_500_000, Integer.MAX_VALUE));
+        ViewportManagerFactory viewportManagerFactory   = commonServiceProvider._register(ViewportManagerFactory.class, new ViewportManagerFactory(packetSender, entityIdFactory));
+        NMSHandler nmsHandler                           = commonServiceProvider._register(NMSHandler.class,             NMSHandlerFactory.getNMSHandler());
+        PlayerManager playerManager                     = commonServiceProvider._register(PlayerManager.class,          new PlayerManager(nmsHandler));
     }
 }

@@ -15,13 +15,11 @@
  * inflicted by the software.                                                                               *
  ************************************************************************************************************/
 
-package com.jverbruggen.jcommon.packet.objects;
+package com.jverbruggen.jcommon.nms;
 
-import com.jverbruggen.jcommon.virtualentity.render.Viewer;
+import com.jverbruggen.jcommon.player.Player;
+import com.jverbruggen.jcommon.math.Vector3;
 
-import java.util.List;
-
-public interface Packet {
-    boolean send(Viewer viewer);
-    void sendAll(List<Viewer> viewers);
+public interface NMSHandler {
+    void setPlayerLocationNoTeleport(Player player, Vector3 position);
 }

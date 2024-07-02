@@ -15,13 +15,29 @@
  * inflicted by the software.                                                                               *
  ************************************************************************************************************/
 
-package com.jverbruggen.jcommon.packet.objects;
+package com.jverbruggen.jcommon.virtualentity.id;
 
-import com.jverbruggen.jcommon.virtualentity.render.Viewer;
+/**
+ * Creates random entity id in range from a - b
+ */
+public class EntityIdFactory {
+    private final int upper;
+    private int next;
 
-import java.util.List;
+    public EntityIdFactory(int lower, int upper) {
+        this.upper = upper;
+        this.next = lower;
+    }
 
-public interface Packet {
-    boolean send(Viewer viewer);
-    void sendAll(List<Viewer> viewers);
+    private int next(){
+        int val = this.next++;
+        if(val > upper){
+            throw new IllegalStateException("Entity ID factory overflowing, restart the server!");
+        }
+        return val;
+    }
+
+    public int newId(){
+        return next();
+    }
 }

@@ -2,7 +2,7 @@
  * GPLv3 License                                                                                            *
  *                                                                                                          *
  * Copyright (c) 2024-2024 JVerbruggen                                                                      *
- * https://github.com/JVerbruggen/jcommon                                                                   *
+ * https://github.com/JVerbruggen/jcommon                                                                    *
  *                                                                                                          *
  * This software is protected under the GPLv3 license,                                                      *
  * that can be found in the project's LICENSE file.                                                         *
@@ -15,13 +15,38 @@
  * inflicted by the software.                                                                               *
  ************************************************************************************************************/
 
-package com.jverbruggen.jcommon.packet.objects;
+package com.jverbruggen.jcommon.virtualentity;
 
-import com.jverbruggen.jcommon.virtualentity.render.Viewer;
+public class ArmorstandModels {
+    private Model head, mainHand, offHand;
 
-import java.util.List;
+    public ArmorstandModels() {
+        this.head = null;
+        this.mainHand = null;
+        this.offHand = null;
+    }
 
-public interface Packet {
-    boolean send(Viewer viewer);
-    void sendAll(List<Viewer> viewers);
+    public void setHead(Model head) {
+        this.head = head;
+    }
+    public void setMainHand(Model mainHand) {
+        this.mainHand = mainHand;
+    }
+    public void setOffHand(Model offHand) {
+        this.offHand = offHand;
+    }
+
+    public boolean hasHead() { return head != null; }
+    public boolean hasMainHand() { return mainHand != null; }
+    public boolean hasOffHand() { return offHand != null; }
+
+    public Model getHead() {
+        return head;
+    }
+    public Model getMainHand() {
+        return mainHand;
+    }
+    public Model getOffHand() {
+        return offHand;
+    }
 }

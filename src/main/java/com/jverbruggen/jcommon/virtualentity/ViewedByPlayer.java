@@ -17,20 +17,20 @@
 
 package com.jverbruggen.jcommon.virtualentity;
 
-import com.jverbruggen.jcommon.bukkit.Player;
+import com.jverbruggen.jcommon.virtualentity.render.Viewer;
 
 import java.util.List;
 
-public interface ViewedByPlayer {
-    List<Player> getViewers();
-    void addViewer(Player player);
-    void removeViewer(Player player);
-    boolean isViewer(Player player);
+public interface ViewedByPlayer extends VirtualEntity, HasAliveStatus, Positioned {
+    List<Viewer> getViewers();
+    void addViewer(Viewer viewer);
+    void removeViewer(Viewer viewer);
+    boolean isViewer(Viewer viewer);
 
-    void spawnFor(Player player);
-    void spawnForAll(List<Player> players);
-    void spawnForAll(List<Player> players, boolean hard);
+    void spawnFor(Viewer viewer);
+    void spawnForAll(List<Viewer> viewers);
+    void spawnForAll(List<Viewer> viewers, boolean hard);
     void despawn();
-    void despawnFor(Player player, boolean removeAsViewer);
-    void despawnForAll(List<Player> players, boolean removeAsViewer);
+    void despawnFor(Viewer viewer, boolean removeAsViewer);
+    void despawnForAll(List<Viewer> viewers, boolean removeAsViewer);
 }

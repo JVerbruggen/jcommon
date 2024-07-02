@@ -17,7 +17,7 @@
 
 package com.jverbruggen.jcommon.virtualentity;
 
-import com.jverbruggen.jcommon.bukkit.Player;
+import com.jverbruggen.jcommon.player.Player;
 import com.jverbruggen.jcommon.interaction.PlayerInteractVirtualEntityAction;
 
 public interface HasAction {

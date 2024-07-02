@@ -2,7 +2,7 @@
  * GPLv3 License                                                                                            *
  *                                                                                                          *
  * Copyright (c) 2024-2024 JVerbruggen                                                                      *
- * https://github.com/JVerbruggen/jcommon                                                                   *
+ * https://github.com/JVerbruggen/jrides                                                                    *
  *                                                                                                          *
  * This software is protected under the GPLv3 license,                                                      *
  * that can be found in the project's LICENSE file.                                                         *
@@ -15,13 +15,55 @@
  * inflicted by the software.                                                                               *
  ************************************************************************************************************/
 
-package com.jverbruggen.jcommon.packet.objects;
+package com.jverbruggen.jcommon.player;
 
-import com.jverbruggen.jcommon.virtualentity.render.Viewer;
+import com.jverbruggen.jcommon.nms.NMSHandler;
+import org.bukkit.Bukkit;
 
-import java.util.List;
+import java.util.*;
 
-public interface Packet {
-    boolean send(Viewer viewer);
-    void sendAll(List<Viewer> viewers);
+public class PlayerManager {
+    private final NMSHandler nmsHandler;
+    private final HashMap<UUID, Player> players;
+
+    public PlayerManager(NMSHandler nmsHandler){
+        this.nmsHandler = nmsHandler;
+        players = new HashMap<>();
+    }
+
+    public Player registerPlayer(org.bukkit.entity.Player bukkitPlayer){
+        Player player = new PlayerImpl(nmsHandler, bukkitPlayer);
+
+        UUID uuid = bukkitPlayer.getUniqueId();
+        players.put(uuid, player);
+        return player;
+    }
+
+    public Player getPlayer(org.bukkit.entity.Player bukkitPlayer){
+        UUID uuid = bukkitPlayer.getUniqueId();
+        if(!players.containsKey(uuid)){
+            return registerPlayer(bukkitPlayer);
+        }
+        return players.get(uuid);
+    }
+
+    public void removePlayer(org.bukkit.entity.Player bukkitPlayer){
+        UUID uuid = bukkitPlayer.getUniqueId();
+        if(!players.containsKey(uuid)){
+            return;
+        }
+        Player player = players.remove(uuid);
+    }
+
+    public Player fromIdentifier(String playerIdentifier){
+        UUID uuid = UUID.fromString(playerIdentifier);
+        org.bukkit.entity.Player bukkitPlayer = Bukkit.getPlayer(uuid);
+        if(bukkitPlayer == null) return null;
+
+        return getPlayer(bukkitPlayer);
+    }
+
+    public Collection<Player> getPlayers(){
+        return players.values();
+    }
 }

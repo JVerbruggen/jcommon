@@ -15,13 +15,24 @@
  * inflicted by the software.                                                                               *
  ************************************************************************************************************/
 
-package com.jverbruggen.jcommon.packet.objects;
+package com.jverbruggen.jcommon.virtualentity.render;
 
-import com.jverbruggen.jcommon.virtualentity.render.Viewer;
+import com.jverbruggen.jcommon.math.Vector3;
+import com.jverbruggen.jcommon.virtualentity.ViewedByPlayer;
 
 import java.util.List;
 
-public interface Packet {
-    boolean send(Viewer viewer);
-    void sendAll(List<Viewer> viewers);
+public interface Viewport {
+    List<ViewedByPlayer> getEntities();
+    List<Viewer> getViewers();
+    boolean isInViewport(Vector3 location);
+    void addViewer(Viewer viewer);
+    void removeViewer(Viewer viewer);
+    void updateFor(Viewer viewer, Vector3 playerLocation);
+    boolean hasViewer(Viewer viewer);
+    void addEntity(ViewedByPlayer viewedByPlayer);
+    void removeEntity(ViewedByPlayer viewedByPlayer);
+    void updateEntityViewers(ViewedByPlayer viewedByPlayer);
+    boolean hasEntity(ViewedByPlayer viewedByPlayer);
+    void flushDeadEntities();
 }

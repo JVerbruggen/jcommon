@@ -15,13 +15,39 @@
  * inflicted by the software.                                                                               *
  ************************************************************************************************************/
 
-package com.jverbruggen.jcommon.packet.objects;
+package com.jverbruggen.jcommon.player;
 
-import com.jverbruggen.jcommon.virtualentity.render.Viewer;
+import com.jverbruggen.jcommon.math.Vector3;
+import com.jverbruggen.jcommon.nms.NMSHandler;
+import org.bukkit.Location;
 
-import java.util.List;
+public class PlayerImpl implements Player{
+    private final NMSHandler nmsHandler;
+    private final org.bukkit.entity.Player bukkitPlayer;
 
-public interface Packet {
-    boolean send(Viewer viewer);
-    void sendAll(List<Viewer> viewers);
+    public PlayerImpl(NMSHandler nmsHandler, org.bukkit.entity.Player bukkitPlayer) {
+        this.nmsHandler = nmsHandler;
+        this.bukkitPlayer = bukkitPlayer;
+    }
+
+    @Override
+    public org.bukkit.entity.Player getBukkitPlayer() {
+        return bukkitPlayer;
+    }
+
+    @Override
+    public void setPositionWithoutTeleport(Vector3 position) {
+        nmsHandler.setPlayerLocationNoTeleport(this, position);
+    }
+
+    @Override
+    public Vector3 getLocation() {
+        Location location = bukkitPlayer.getLocation();
+
+        double x = location.getX();
+        double y = location.getY();
+        double z = location.getZ();
+
+        return new Vector3(x, y, z);
+    }
 }

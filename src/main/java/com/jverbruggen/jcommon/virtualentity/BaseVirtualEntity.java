@@ -17,16 +17,22 @@
 
 package com.jverbruggen.jcommon.virtualentity;
 
-import com.jverbruggen.jcommon.bukkit.Player;
+import com.jverbruggen.jcommon.player.Player;
+import com.jverbruggen.jcommon.serviceprovider.CommonServiceProvider;
+import com.jverbruggen.jcommon.virtualentity.render.Viewer;
 import com.jverbruggen.jcommon.math.Vector3;
 import com.jverbruggen.jcommon.packet.sender.PacketSender;
-import com.jverbruggen.jcommon.serviceprovider.internal.InternalServiceProvider;
+import com.jverbruggen.jcommon.virtualentity.render.manager.ViewportManager;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
 public abstract class BaseVirtualEntity implements VirtualEntity, ViewedByPlayer {
+    // Services
+    protected final PacketSender packetSender;
+    protected final ViewportManager viewportManager;
+
     // Properties
     private UUID uuid;
     private final int entityId;
@@ -34,27 +40,36 @@ public abstract class BaseVirtualEntity implements VirtualEntity, ViewedByPlayer
     // Players
     private Player seatedPlayer;
     private boolean allowsSeatedPlayer;
+    private boolean passengerSyncCounterActive;
+    private int passengerSyncCounter;
 
     // Rendering
     private boolean spawned;
     private boolean rendered;
     private Vector3 location;
     private double yawRotation;
-    protected List<Player> viewers;
+    protected List<Viewer> viewers;
     private Model model;
+    private int teleportSyncCountdownState; // If entity isn't teleported every few frames, it starts drifting due to only relative updates
 
-    public BaseVirtualEntity(Vector3 location, double yawRotation, int entityId) {
+    public BaseVirtualEntity(CommonServiceProvider serviceProvider, Vector3 location, double yawRotation, int entityId) {
+        this.packetSender = serviceProvider._getSingleton(PacketSender.class);
+        this.viewportManager = serviceProvider._getSingleton(ViewportManager.class);
+
         this.uuid = UUID.randomUUID();
         this.entityId = entityId;
 
         this.seatedPlayer = null;
         this.allowsSeatedPlayer = false;
+        this.passengerSyncCounterActive = false;
+        this.passengerSyncCounter = 0;
 
         this.spawned = true;
         this.rendered = true;
         this.location = location;
         this.yawRotation = yawRotation;
         this.viewers = new ArrayList<>();
+        this.teleportSyncCountdownState = 0;
     }
 
     @Override
@@ -85,6 +100,15 @@ public abstract class BaseVirtualEntity implements VirtualEntity, ViewedByPlayer
     @Override
     public void setSeatedPlayer(Player seatedPlayer) {
         this.seatedPlayer = seatedPlayer;
+
+        packetSender.sendSeatedPlayerPacket(viewers, seatedPlayer, this);
+
+        if(seatedPlayer != null){
+            this.passengerSyncCounterActive = true;
+            this.passengerSyncCounter = 0;
+        }else{
+            this.passengerSyncCounterActive = false;
+        }
     }
 
     @Override
@@ -93,8 +117,33 @@ public abstract class BaseVirtualEntity implements VirtualEntity, ViewedByPlayer
     }
 
     @Override
-    public void setLocation(Vector3 location) {
-        this.location = location;
+    public void setLocation(Vector3 newLocation) {
+        if(newLocation == null) return;
+
+        final int chunkSize = viewportManager.getRenderChunkSize();
+
+        if(Vector3.chunkRotated(this.location, newLocation, chunkSize)){
+            viewportManager.updateForEntity(this);
+        }
+
+        double distanceSquared = newLocation.distanceSquared(this.location);
+
+        if(distanceSquared > 49 || teleportSyncCountdownState > 60) {
+            Vector3 blockLocation = newLocation.toBlock();
+            teleportEntity(blockLocation);
+            teleportSyncCountdownState = 0;
+
+            Vector3 delta = Vector3.subtract(newLocation, newLocation.toBlock());
+            moveEntity(delta, 0);
+        }
+        else{
+            Vector3 delta = Vector3.subtract(newLocation, this.location);
+            moveEntity(delta, 0);
+        }
+
+        this.location = newLocation;
+
+        teleportSyncCountdownState++;
     }
 
     @Override
@@ -108,64 +157,61 @@ public abstract class BaseVirtualEntity implements VirtualEntity, ViewedByPlayer
     }
 
     @Override
-    public List<Player> getViewers() {
+    public List<Viewer> getViewers() {
         return viewers;
     }
 
     @Override
-    public void addViewer(Player player) {
-        if(viewers.contains(player)) return;
+    public void addViewer(Viewer viewer) {
+        if(viewers.contains(viewer)) return;
 
-        viewers.add(player);
+        viewers.add(viewer);
     }
 
     @Override
-    public void removeViewer(Player player) {
-        viewers.remove(player);
+    public void removeViewer(Viewer viewer) {
+        viewers.remove(viewer);
     }
 
     @Override
-    public boolean isViewer(Player player) {
-        return viewers.contains(player);
-    }
-
-    public abstract void spawnFor(Player player, PacketSender packetSender);
-
-    @Override
-    public void spawnFor(Player player) {
-        PacketSender packetSender = InternalServiceProvider.getSingleton(PacketSender.class);
-        spawnFor(player, packetSender);
+    public boolean isViewer(Viewer viewer) {
+        return viewers.contains(viewer);
     }
 
     @Override
-    public void spawnForAll(List<Player> players) {
-        spawnForAll(players, false);
+    public void spawnFor(Viewer viewer) {
+        spawnFor(viewer, packetSender);
     }
 
     @Override
-    public void spawnForAll(List<Player> players, boolean hard) {
-        players.forEach(this::spawnFor);
+    public void spawnForAll(List<Viewer> viewers) {
+        spawnForAll(viewers, false);
+    }
+
+    @Override
+    public void spawnForAll(List<Viewer> viewers, boolean hard) {
+        viewers.forEach(this::spawnFor);
     }
 
     @Override
     public void despawn() {
         spawned = false;
-        InternalServiceProvider.getSingleton(PacketSender.class).sendDestroyVirtualEntityForPacket(getViewers(), this);
+        packetSender.sendDestroyVirtualEntityForPacket(getViewers(), this);
     }
 
     @Override
-    public void despawnFor(Player player, boolean removeAsViewer) {
+    public void despawnFor(Viewer viewer, boolean removeAsViewer) {
         if(removeAsViewer)
-            removeViewer(player);
+            removeViewer(viewer);
 
-        InternalServiceProvider.getSingleton(PacketSender.class).sendDestroyVirtualEntityForPacket(player, this);
+        packetSender.sendDestroyVirtualEntityForPacket(viewer, this);
     }
 
     @Override
-    public void despawnForAll(List<Player> players, boolean removeAsViewer) {
-        for(Player player : List.copyOf(players)){
-            if(!isViewer(player)) continue;
-            despawnFor(player, removeAsViewer);
+    public void despawnForAll(List<Viewer> viewers, boolean removeAsViewer) {
+        for(Viewer viewer : List.copyOf(viewers)){
+            if(!isViewer(viewer)) continue;
+            despawnFor(viewer, removeAsViewer);
         }
     }
 
@@ -189,4 +235,20 @@ public abstract class BaseVirtualEntity implements VirtualEntity, ViewedByPlayer
     public void setModel(Model model) {
         this.model = model;
     }
+
+    protected void syncSeatedPlayer(Vector3 position){
+        if(passengerSyncCounterActive){
+            if(passengerSyncCounter > 20){
+                passengerSyncCounter = 0;
+
+                this.seatedPlayer.setPositionWithoutTeleport(position);
+            }else passengerSyncCounter++;
+        }
+    }
+
+    public abstract void spawnFor(Viewer viewer, PacketSender packetSender);
+
+    protected abstract void moveEntity(Vector3 delta, double yawRotation);
+
+    protected abstract void teleportEntity(Vector3 newLocation);
 }

@@ -34,12 +34,14 @@ public class HashMapCommonServiceProvider implements CommonServiceProvider {
         if(!instances.containsKey(type)) throw new RuntimeException("Type " + type.getTypeName() + " was not registered to the ServiceProvider");
 
         Object object = instances.get(type);
-        return (T) object;
+        return type.cast(object);
     }
 
     @Override
-    public void _register(Class type, Object instance) {
+    public <T> T _register(Class<T> type, T instance) {
         instances.put(type, instance);
+
+        return instance;
     }
 
     @Override

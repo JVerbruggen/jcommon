@@ -15,13 +15,22 @@
  * inflicted by the software.                                                                               *
  ************************************************************************************************************/
 
-package com.jverbruggen.jcommon.packet.objects;
+package com.jverbruggen.jcommon.sync;
 
-import com.jverbruggen.jcommon.virtualentity.render.Viewer;
+import org.bukkit.Bukkit;
+import org.bukkit.plugin.java.JavaPlugin;
+import org.bukkit.scheduler.BukkitScheduler;
 
-import java.util.List;
+public class TaskScheduler {
+    private final BukkitScheduler bukkitScheduler;
+    private final JavaPlugin javaPlugin;
 
-public interface Packet {
-    boolean send(Viewer viewer);
-    void sendAll(List<Viewer> viewers);
+    public TaskScheduler(BukkitScheduler bukkitScheduler, JavaPlugin javaPlugin) {
+        this.bukkitScheduler = bukkitScheduler;
+        this.javaPlugin = javaPlugin;
+    }
+
+    public void runTaskLater(Runnable runnable, long delay){
+        Bukkit.getScheduler().runTaskLater(javaPlugin, runnable, delay);
+    }
 }

@@ -2,7 +2,7 @@
  * GPLv3 License                                                                                            *
  *                                                                                                          *
  * Copyright (c) 2024-2024 JVerbruggen                                                                      *
- * https://github.com/JVerbruggen/jcommon                                                                   *
+ * https://github.com/JVerbruggen/jrides                                                                    *
  *                                                                                                          *
  * This software is protected under the GPLv3 license,                                                      *
  * that can be found in the project's LICENSE file.                                                         *
@@ -15,13 +15,18 @@
  * inflicted by the software.                                                                               *
  ************************************************************************************************************/
 
-package com.jverbruggen.jcommon.packet.objects;
+package com.jverbruggen.jcommon.nms;
 
-import com.jverbruggen.jcommon.virtualentity.render.Viewer;
+import org.bukkit.Bukkit;
 
-import java.util.List;
+public class NMSHandlerFactory {
+    public static NMSHandler getNMSHandler(){
+        String currentVersion = Bukkit.getVersion();
 
-public interface Packet {
-    boolean send(Viewer viewer);
-    void sendAll(List<Viewer> viewers);
+        if(currentVersion.contains("1.20")){
+            return new NMSHandler_1_20_4();
+        }
+
+        throw new RuntimeException("No nms handler implemented for bukkit version '" + currentVersion + "'");
+    }
 }

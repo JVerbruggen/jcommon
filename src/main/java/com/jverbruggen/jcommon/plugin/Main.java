@@ -20,15 +20,18 @@ package com.jverbruggen.jcommon.plugin;
 import com.jverbruggen.jcommon.JCommon;
 import com.jverbruggen.jcommon.logging.Logger;
 import com.jverbruggen.jcommon.manager.JCommonManager;
-import com.jverbruggen.jcommon.serviceprovider.internal.InternalServiceProvider;
+import com.jverbruggen.jcommon.serviceprovider.CommonServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
 
+@SuppressWarnings("unused")
 public class Main extends JavaPlugin {
     @Override
     public void onLoad() {
         JCommonManager jCommonManager = JCommon.getManager(this);
+        CommonServiceProvider serviceProvider = jCommonManager.getInternalServiceProvider();
+
         String version = jCommonManager.getVersion();
 
-        InternalServiceProvider.getSingleton(Logger.class).info("JCommon version " + version);
+        serviceProvider._getSingleton(Logger.class).info("JCommon version " + version);
     }
 }

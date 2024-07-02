@@ -18,6 +18,7 @@
 package com.jverbruggen.jcommon.manager;
 
 import com.jverbruggen.jcommon.serviceprovider.CommonServiceProvider;
+import com.jverbruggen.jcommon.virtualentity.render.manager.ViewportManager;
 import org.bukkit.Bukkit;
 
 public class JCommonManager {
@@ -27,9 +28,12 @@ public class JCommonManager {
         this.serviceProvider = serviceProvider;
     }
 
-
-    public CommonServiceProvider getServiceProvider(){
+    public CommonServiceProvider getInternalServiceProvider(){
         return serviceProvider;
+    }
+
+    public ViewportManager getViewportManager(){
+        return serviceProvider._getSingleton(ViewportManager.class);
     }
 
     public String getVersion(){

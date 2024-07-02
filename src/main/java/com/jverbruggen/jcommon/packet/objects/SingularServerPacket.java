@@ -19,7 +19,8 @@ package com.jverbruggen.jcommon.packet.objects;
 
 import com.comphenix.protocol.ProtocolManager;
 import com.comphenix.protocol.events.PacketContainer;
-import com.jverbruggen.jcommon.bukkit.Player;
+import com.jverbruggen.jcommon.player.Player;
+import com.jverbruggen.jcommon.virtualentity.render.Viewer;
 
 import java.util.List;
 
@@ -38,15 +39,15 @@ public abstract class SingularServerPacket implements Packet {
     }
 
     @Override
-    public boolean send(Player player) {
-        return sendPacket(player, getPacket());
+    public boolean send(Viewer viewer) {
+        return sendPacket(viewer, getPacket());
     }
 
     @Override
-    public void sendAll(List<Player> players) {
+    public void sendAll(List<Viewer> viewers) {
         PacketContainer packet = getPacket();
-        for(Player player : players){
-            sendPacket(player, packet);
+        for(Viewer viewer : viewers){
+            sendPacket(viewer, packet);
         }
     }
 }

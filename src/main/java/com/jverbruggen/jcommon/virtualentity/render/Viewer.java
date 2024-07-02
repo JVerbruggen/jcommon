@@ -15,13 +15,14 @@
  * inflicted by the software.                                                                               *
  ************************************************************************************************************/
 
-package com.jverbruggen.jcommon.packet.objects;
+package com.jverbruggen.jcommon.virtualentity.render;
 
-import com.jverbruggen.jcommon.virtualentity.render.Viewer;
+import com.jverbruggen.jcommon.player.Player;
+import com.jverbruggen.jcommon.virtualentity.Positioned;
+import com.jverbruggen.jcommon.virtualentity.ViewedByPlayer;
 
-import java.util.List;
-
-public interface Packet {
-    boolean send(Viewer viewer);
-    void sendAll(List<Viewer> viewers);
+public interface Viewer extends Player, Positioned {
+    boolean isViewing(ViewedByPlayer viewedByPlayer);
+    void addViewing(ViewedByPlayer viewedByPlayer);
+    void removeViewing(ViewedByPlayer viewedByPlayer);
 }

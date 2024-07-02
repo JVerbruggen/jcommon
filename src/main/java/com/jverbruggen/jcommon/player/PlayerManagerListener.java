@@ -2,7 +2,7 @@
  * GPLv3 License                                                                                            *
  *                                                                                                          *
  * Copyright (c) 2024-2024 JVerbruggen                                                                      *
- * https://github.com/JVerbruggen/jcommon                                                                   *
+ * https://github.com/JVerbruggen/jrides                                                                    *
  *                                                                                                          *
  * This software is protected under the GPLv3 license,                                                      *
  * that can be found in the project's LICENSE file.                                                         *
@@ -15,8 +15,21 @@
  * inflicted by the software.                                                                               *
  ************************************************************************************************************/
 
-package com.jverbruggen.jcommon.bukkit;
+package com.jverbruggen.jcommon.player;
 
-public interface Player {
-    org.bukkit.entity.Player getBukkitPlayer();
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.Listener;
+import org.bukkit.event.player.PlayerQuitEvent;
+
+public class PlayerManagerListener implements Listener {
+    private final PlayerManager playerManager;
+
+    public PlayerManagerListener(PlayerManager playerManager) {
+        this.playerManager = playerManager;
+    }
+
+    @EventHandler
+    public void onQuit(PlayerQuitEvent event){
+        playerManager.removePlayer(event.getPlayer());
+    }
 }

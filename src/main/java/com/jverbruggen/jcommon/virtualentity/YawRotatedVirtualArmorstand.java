@@ -2,7 +2,7 @@
  * GPLv3 License                                                                                            *
  *                                                                                                          *
  * Copyright (c) 2024-2024 JVerbruggen                                                                      *
- * https://github.com/JVerbruggen/jcommon                                                                   *
+ * https://github.com/JVerbruggen/jrides                                                                    *
  *                                                                                                          *
  * This software is protected under the GPLv3 license,                                                      *
  * that can be found in the project's LICENSE file.                                                         *
@@ -15,13 +15,29 @@
  * inflicted by the software.                                                                               *
  ************************************************************************************************************/
 
-package com.jverbruggen.jcommon.packet.objects;
+package com.jverbruggen.jcommon.virtualentity;
 
-import com.jverbruggen.jcommon.virtualentity.render.Viewer;
+import com.jverbruggen.jcommon.math.Quaternion;
+import com.jverbruggen.jcommon.math.Vector3;
+import com.jverbruggen.jcommon.packet.sender.PacketSender;
+import com.jverbruggen.jcommon.virtualentity.render.manager.ViewportManager;
 
-import java.util.List;
+import javax.annotation.Nonnull;
 
-public interface Packet {
-    boolean send(Viewer viewer);
-    void sendAll(List<Viewer> viewers);
+public class YawRotatedVirtualArmorstand extends VirtualArmorStand {
+    public YawRotatedVirtualArmorstand(PacketSender packetSender, ViewportManager viewportManager, Vector3 location, Quaternion orientation, double yawRotation, int entityId, @Nonnull VirtualArmorstandConfiguration configuration) {
+        super(packetSender, viewportManager, location, orientation, yawRotation, entityId);
+    }
+
+    @Override
+    public void setRotation(Quaternion orientation) {
+        if(orientation == null) return;
+
+        Vector3 headPose = ArmorStandPose.getArmorStandPose(orientation);
+        headPose.y = 0;
+
+        setHeadPose(headPose);
+        setYaw(packetSender.toPacketYaw(orientation.getYaw() - 90));
+        moveEntity(Vector3.zero(), getYaw());
+    }
 }

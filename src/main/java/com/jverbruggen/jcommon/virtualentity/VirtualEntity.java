@@ -17,13 +17,12 @@
 
 package com.jverbruggen.jcommon.virtualentity;
 
-import com.jverbruggen.jcommon.bukkit.Player;
+import com.jverbruggen.jcommon.player.Player;
 import com.jverbruggen.jcommon.math.Vector3;
 
-import java.util.List;
 import java.util.UUID;
 
-public interface VirtualEntity {
+public interface VirtualEntity extends HasAliveStatus, Positioned {
     UUID getUUID();
     int getEntityId();
 
@@ -32,12 +31,9 @@ public interface VirtualEntity {
     boolean hasSeatedPlayer();
     void setSeatedPlayer(Player player);
 
-    Vector3 getLocation();
-    void setLocation(Vector3 location);
+    void setLocation(Vector3 newLocation);
 
     double getYaw();
-
-    boolean isAlive();
 
     boolean isRendered();
     void setRendered(boolean render);

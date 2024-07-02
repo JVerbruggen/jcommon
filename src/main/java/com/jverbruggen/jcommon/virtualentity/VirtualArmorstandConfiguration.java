@@ -2,7 +2,7 @@
  * GPLv3 License                                                                                            *
  *                                                                                                          *
  * Copyright (c) 2024-2024 JVerbruggen                                                                      *
- * https://github.com/JVerbruggen/jcommon                                                                   *
+ * https://github.com/JVerbruggen/jrides                                                                    *
  *                                                                                                          *
  * This software is protected under the GPLv3 license,                                                      *
  * that can be found in the project's LICENSE file.                                                         *
@@ -15,13 +15,22 @@
  * inflicted by the software.                                                                               *
  ************************************************************************************************************/
 
-package com.jverbruggen.jcommon.packet.objects;
+package com.jverbruggen.jcommon.virtualentity;
 
-import com.jverbruggen.jcommon.virtualentity.render.Viewer;
+public record VirtualArmorstandConfiguration(
+        ArmorstandRotations rotations,
+        ArmorstandModels models,
+        boolean invisible,
+        int leashedToEntity,
+        String customName) {
+    private static final int DEFAULT_LEASHED_TO_VALUE = -1;
+    private static final boolean DEFAULT_INVISIBLE = true;
 
-import java.util.List;
+    public static VirtualArmorstandConfiguration createWithName(String customName){
+        return new VirtualArmorstandConfiguration(new ArmorstandRotations(), new ArmorstandModels(), DEFAULT_INVISIBLE, DEFAULT_LEASHED_TO_VALUE, customName);
+    }
 
-public interface Packet {
-    boolean send(Viewer viewer);
-    void sendAll(List<Viewer> viewers);
+    public static VirtualArmorstandConfiguration createDefault(){
+        return new VirtualArmorstandConfiguration(new ArmorstandRotations(), new ArmorstandModels(), DEFAULT_INVISIBLE, DEFAULT_LEASHED_TO_VALUE, null);
+    }
 }

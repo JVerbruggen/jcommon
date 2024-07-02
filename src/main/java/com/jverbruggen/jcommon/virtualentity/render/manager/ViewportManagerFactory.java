@@ -15,13 +15,25 @@
  * inflicted by the software.                                                                               *
  ************************************************************************************************************/
 
-package com.jverbruggen.jcommon.packet.objects;
+package com.jverbruggen.jcommon.virtualentity.render.manager;
 
-import com.jverbruggen.jcommon.virtualentity.render.Viewer;
+import com.jverbruggen.jcommon.packet.sender.PacketSender;
+import com.jverbruggen.jcommon.virtualentity.id.EntityIdFactory;
+import com.jverbruggen.jcommon.virtualentity.render.GlobalViewport;
 
-import java.util.List;
+public class ViewportManagerFactory {
+    private final PacketSender packetSender;
+    private final EntityIdFactory entityIdFactory;
 
-public interface Packet {
-    boolean send(Viewer viewer);
-    void sendAll(List<Viewer> viewers);
+    public ViewportManagerFactory(PacketSender packetSender, EntityIdFactory entityIdFactory) {
+        this.packetSender = packetSender;
+        this.entityIdFactory = entityIdFactory;
+    }
+
+    public ViewportManager createViewportManager(){
+        int renderDistance = 100;
+        int renderChunkSize = 8;
+
+        return new GlobalViewportManager(new GlobalViewport(renderDistance), packetSender, entityIdFactory, renderDistance, renderChunkSize);
+    }
 }

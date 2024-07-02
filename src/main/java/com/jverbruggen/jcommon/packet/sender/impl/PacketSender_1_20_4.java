@@ -18,30 +18,30 @@
 package com.jverbruggen.jcommon.packet.sender.impl;
 
 import com.comphenix.protocol.ProtocolManager;
-import com.jverbruggen.jcommon.bukkit.Player;
+import com.jverbruggen.jcommon.packet.objects.v1_20.*;
+import com.jverbruggen.jcommon.player.Player;
 import com.jverbruggen.jcommon.logging.Logger;
 import com.jverbruggen.jcommon.math.Vector3;
-import com.jverbruggen.jcommon.packet.objects.v1_20.EntityDestroyServerPacket;
-import com.jverbruggen.jcommon.packet.objects.v1_20.EntityEquipmentServerPacket;
-import com.jverbruggen.jcommon.packet.objects.v1_20.EntityMountServerPacket;
-import com.jverbruggen.jcommon.packet.objects.v1_20.SpawnArmorstandServerPacket;
 import com.jverbruggen.jcommon.packet.sender.ModelSlot;
 import com.jverbruggen.jcommon.packet.sender.PacketSender;
+import com.jverbruggen.jcommon.virtualentity.ArmorstandRotationBone;
 import com.jverbruggen.jcommon.virtualentity.Model;
 import com.jverbruggen.jcommon.virtualentity.VirtualArmorStand;
 import com.jverbruggen.jcommon.virtualentity.VirtualEntity;
+import com.jverbruggen.jcommon.virtualentity.render.Viewer;
 
 import java.util.List;
 import java.util.UUID;
 
 public class PacketSender_1_20_4 extends BasePacketSender implements PacketSender {
+    private static final Vector3 ARMORSTAND_MODEL_COMPENSATION_1_20_4 = new Vector3(0, 1.7, 0);
 
     public PacketSender_1_20_4(ProtocolManager protocolManager, Logger logger) {
         super(protocolManager, logger);
     }
 
     @Override
-    public void sendSpawnVirtualArmorstandForPacket(Player player, VirtualArmorStand virtualArmorStand) {
+    public void sendSpawnVirtualArmorstandForPacket(Viewer viewer, VirtualArmorStand virtualArmorStand) {
         sendDebugLog("sendSpawnVirtualArmorstandForPacket (single)");
 
         Vector3 location = virtualArmorStand.getLocation();
@@ -57,46 +57,76 @@ public class PacketSender_1_20_4 extends BasePacketSender implements PacketSende
     }
 
     @Override
-    public void sendAddModelToEntityPacket(Player player, VirtualEntity virtualEntity, ModelSlot modelSlot, Model model) {
+    public void sendAddModelToEntityPacket(Viewer viewer, VirtualEntity virtualEntity, ModelSlot modelSlot, Model model) {
         if(model == null) return;
         sendDebugLog("sendAddModelToEntityPacket (single)");
         int entityId = virtualEntity.getEntityId();
 
         new EntityEquipmentServerPacket(
                 protocolManager, entityId, ModelSlot.toItemSlot(modelSlot), model
-        ).send(player);
+        ).send(viewer);
     }
 
     @Override
-    public void sendSeatedPlayerPacket(List<Player> players, Player seatedPlayer, VirtualEntity virtualEntity) {
+    public void sendAddModelToEntityPacket(List<Viewer> viewers, VirtualEntity virtualEntity, ModelSlot modelSlot, Model model) {
+        if(model == null) return;
+        sendDebugLog("sendAddModelToEntityPacket (multiple");
+        int entityId = virtualEntity.getEntityId();
+
+        new EntityEquipmentServerPacket(
+                protocolManager, entityId, ModelSlot.toItemSlot(modelSlot), model
+        ).sendAll(viewers);
+    }
+
+    @Override
+    public void sendSeatedPlayerPacket(List<Viewer> viewers, Player seatedPlayer, VirtualEntity virtualEntity) {
         sendDebugLog("sendSeatedPlayerPacket (multiple)");
         int entityId = virtualEntity.getEntityId();
 
-        new EntityMountServerPacket(protocolManager, entityId, seatedPlayer).sendAll(players);
+        new EntityMountServerPacket(protocolManager, entityId, seatedPlayer).sendAll(viewers);
     }
 
     @Override
-    public void sendDestroyVirtualEntityForPacket(Player player, VirtualEntity virtualEntity) {
+    public void sendRotationPacket(List<Viewer> players, VirtualEntity virtualEntity, ArmorstandRotationBone rotationBone, Vector3 rotation) {
+        sendDebugLog("sendRotationPacket (multiple)");
+
+        new ArmorstandRotationServerPacket(
+                protocolManager, virtualEntity.getEntityId(), rotationBone, rotation
+        ).sendAll(players);
+    }
+
+    @Override
+    public void sendDestroyVirtualEntityForPacket(Viewer viewer, VirtualEntity virtualEntity) {
         sendDebugLog("sendDestroyVirtualEntityForPacket (single)");
         int entityId = virtualEntity.getEntityId();
 
         new EntityDestroyServerPacket(
                 protocolManager, entityId
-        ).send(player);
+        ).send(viewer);
     }
 
     @Override
-    public void sendDestroyVirtualEntityForPacket(List<Player> players, VirtualEntity virtualEntity) {
+    public void sendDestroyVirtualEntityForPacket(List<Viewer> viewers, VirtualEntity virtualEntity) {
         sendDebugLog("sendDestroyVirtualEntityForPacket (multiple)");
         int entityId = virtualEntity.getEntityId();
 
         new EntityDestroyServerPacket(
                 protocolManager, entityId
-        ).sendAll(players);
+        ).sendAll(viewers);
+    }
+
+    @Override
+    public Vector3 getArmorstandModelCompensationVector() {
+        return ARMORSTAND_MODEL_COMPENSATION_1_20_4;
     }
 
     @Override
     public String getSenderVersion() {
         return "1.20.4";
+    }
+
+    @Override
+    public double toPacketYaw(double normalYaw) {
+        return normalYaw*256/360;
     }
 }
